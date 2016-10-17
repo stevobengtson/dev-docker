@@ -1,0 +1,43 @@
+version: '2'
+services:
+  # Mysql Database
+  db:
+    image: mysql/mysql-server:5.5.47
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+
+  # Postgresql Database
+  dbpost:
+    image: postgres:9.4
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: root
+
+  # Redis server
+  redis:
+    image: tenstartups/redis
+    command: redis-server --appendonly yes --protected-mode no
+    ports:
+      - 6379:6379
+
+  # NGINX Server for varsitytutors.dev
+  # TODO: Figure out way to replace with the nginx_proxy
+  nginx:
+    build: nginx_build
+    ports:
+      - 80:80
+      - 443:443
+    extra_hosts:
+      - "dockerhost:192.168.1.82" # Change to your computers IP and restart container (docker-compose stop nginx && docker-compose start nginx)
+
+  # Mailcatcher for emails
+  mailcatcher:
+    image: yappabe/mailcatcher
+    ports:
+      - 1025:1025
+      - 1080:1080
+

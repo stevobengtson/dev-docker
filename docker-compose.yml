@@ -1,7 +1,7 @@
 version: '2'
 services:
   # Mysql Database
-  db:
+  dbmysql:
     image: mysql/mysql-server:5.5.47
     ports:
       - 3306:3306
@@ -25,14 +25,13 @@ services:
       - 6379:6379
 
   # NGINX Server for varsitytutors.dev
-  # TODO: Figure out way to replace with the nginx_proxy
   nginx:
     build: nginx_build
     ports:
       - 80:80
       - 443:443
     extra_hosts:
-      - "dockerhost:192.168.1.82" # Change to your computers IP and restart container (docker-compose stop nginx && docker-compose start nginx)
+      - "dockerhost:172.31.31.1" # Ensure you run `sudo ifconfig lo0 alias 172.31.31.1` to create the loop back alias
 
   # Mailcatcher for emails
   mailcatcher:
@@ -41,3 +40,14 @@ services:
       - 1025:1025
       - 1080:1080
 
+  poxa:
+    image: edgurgel/poxa-automated
+    volumes:
+      - ./config/poxa.conf:/app/poxa/running-config/poxa.conf
+    environment:
+      PORT: 8080
+      POXA_APP_KEY: 4bc2798ae34bb1563a3a
+      POXA_SECRET: 234fb2f3ae7666dc39bd
+      POXA_APP_ID: 55447
+    ports:
+      - 8080:8080

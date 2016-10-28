@@ -1,8 +1,11 @@
 version: '2'
 services:
   # Mysql Database
-  dbmysql:
+  db:
     image: mysql/mysql-server:5.5.47
+    volumes:
+      - ./mysql_build:/etc/mysql/conf.d
+      - ./mysql_build:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
     environment:
@@ -10,12 +13,12 @@ services:
 
   # Postgresql Database
   dbpost:
-    image: postgres:9.4
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: root
+   image: postgres:9.4
+   ports:
+     - 5432:5432
+   environment:
+     POSTGRES_PASSWORD: password
+     POSTGRES_USER: root
 
   # Redis server
   redis:
@@ -31,7 +34,7 @@ services:
       - 80:80
       - 443:443
     extra_hosts:
-      - "dockerhost:172.31.31.1" # Ensure you run `sudo ifconfig lo0 alias 172.31.31.1` to create the loop back alias
+      - "dockerhost:${HOST_IP}" # Change to your computers IP and rebuild container (docker-compose build nginx)
 
   # Mailcatcher for emails
   mailcatcher:
@@ -40,14 +43,3 @@ services:
       - 1025:1025
       - 1080:1080
 
-  poxa:
-    image: edgurgel/poxa-automated
-    volumes:
-      - ./config/poxa.conf:/app/poxa/running-config/poxa.conf
-    environment:
-      PORT: 8080
-      POXA_APP_KEY: 4bc2798ae34bb1563a3a
-      POXA_SECRET: 234fb2f3ae7666dc39bd
-      POXA_APP_ID: 55447
-    ports:
-      - 8080:8080
